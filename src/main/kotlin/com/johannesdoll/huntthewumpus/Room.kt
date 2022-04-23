@@ -3,7 +3,8 @@ package com.johannesdoll.huntthewumpus
 import arrow.optics.optics
 
 data class Room(
-    val content: RoomContent
+    val roomNumber: Int = 0,
+    val content: RoomContent = RoomContent.Empty
 )
 
 @optics
