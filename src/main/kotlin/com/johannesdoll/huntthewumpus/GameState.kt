@@ -8,7 +8,7 @@ sealed interface GameState {
 
     data class Lost(override val inventory: Inventory) : GameState
     data class Won(override val inventory: Inventory) : GameState
-
+    data class Idle(override val inventory: Inventory) : GameState
 }
 
 val Either<GameState, GameState>.state: GameState

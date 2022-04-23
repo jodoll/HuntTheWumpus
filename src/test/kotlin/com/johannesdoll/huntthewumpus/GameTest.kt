@@ -48,4 +48,13 @@ internal class GameTest : BehaviorSpec({
         }
     }
 
+    Given("An empty room") {
+        val room = Room(RoomContent.Empty)
+        When("The player enters the room") {
+            val state = room.enter(inventory = Inventory())
+            Then("Game state is Idle") {
+                state should beInstanceOf<GameState.Idle>()
+            }
+        }
+    }
 })
