@@ -6,9 +6,10 @@ import arrow.core.continuations.either
 fun Room.enter(state: GameState<*>): GameState<*> = when (content) {
     RoomContent.Wumpus,
     RoomContent.BottomlessPit -> state.inRoom(this).loose()
-    RoomContent.GiantBat -> state.inRoom(state.map.keys.first())
+    RoomContent.GiantBat -> state.inRoom(state.random.nextRandomRoom(state.map.emptyRooms()))
     RoomContent.Empty -> state.inRoom(this)
 }
+
 
 fun Room.shoot(state: GameState<*>): Either<GameState<*>, GameState<*>> = either.eager {
     val updatedInventory = state.inventory

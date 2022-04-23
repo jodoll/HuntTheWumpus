@@ -9,13 +9,15 @@ import io.kotest.matchers.shouldNot
 import io.kotest.matchers.types.beInstanceOf
 
 internal class GameTest : BehaviorSpec({
+    val gameMap = mapOf(
+        Room(2) to setOf(Room(1)),
+        Room(1) to setOf(Room(2))
+    )
     val initialState = GameState.Idle(
         inventory = Inventory(),
         currentRoom = Room(1),
-        map = mapOf(
-            Room(2) to setOf(Room(1)),
-            Room(1) to setOf(Room(2))
-        )
+        map = GameMap(gameMap),
+        random = PseudoRandomGameLogic()
     )
 
     Given("A room with a wumpus") {
@@ -61,10 +63,40 @@ internal class GameTest : BehaviorSpec({
                 state.map.keys shouldContain state.currentRoom
             }
         }
+        And("The next random room is empty") {
+            val testState = initialState.copy(
+                map = GameMap(
+                    Room(1, content = RoomContent.Wumpus) to emptySet(),
+                    Room(0, content = RoomContent.Empty) to emptySet()
+                ),
+                random = SpoofedRandomGameLogic(0)
+            )
+            When("The player enters the room with the giant Bat") {
+                val state = room.enter(testState)
+                Then("The player is moved to that room") {
+                    state.currentRoom.number shouldBe 0
+                }
+            }
+        }
+        And("The next random room is not empty") {
+            val testState = initialState.copy(
+                map = GameMap(
+                    Room(1, content = RoomContent.Wumpus) to emptySet(),
+                    Room(0, content = RoomContent.Empty) to emptySet()
+                ),
+                random = PseudoRandomGameLogic()
+            )
+            When("The player enters the room with the giant Bat") {
+                val state = room.enter(testState)
+                Then("The player is moved to an empty room") {
+                    state.currentRoom.content should beInstanceOf<RoomContent.Empty>()
+                }
+            }
+        }
     }
 
     Given("A room") {
-        val room = Room(roomNumber = 1, content = RoomContent.Wumpus)
+        val room = Room(number = 1, content = RoomContent.Wumpus)
         And("The player has an arrow left") {
             val inventory = Inventory(arrows = 1)
             When("The player shoots into the room") {
