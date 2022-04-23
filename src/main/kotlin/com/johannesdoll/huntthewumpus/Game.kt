@@ -11,10 +11,13 @@ fun Room.enter(state: GameState<*>): GameState<*> = when (content) {
 fun Room.shoot(state: GameState<*>): Either<GameState<*>, GameState<*>> = either.eager {
     val updatedInventory = state.inventory
         .consumeArrow()
-        .mapLeft { GameState.Won(state.inventory, state.currentRoom) }
+        .mapLeft { GameState.Idle(state.inventory, state.currentRoom) }
         .bind()
 
-    GameState.Won(updatedInventory, state.currentRoom)
+    when (content) {
+        is RoomContent.Empty -> state.withInventory(updatedInventory)
+        is RoomContent.Wumpus -> GameState.Won(updatedInventory, state.currentRoom)
+    }
 }
 
 private fun Inventory.consumeArrow(): Either<Inventory, Inventory> = Either.conditionally(

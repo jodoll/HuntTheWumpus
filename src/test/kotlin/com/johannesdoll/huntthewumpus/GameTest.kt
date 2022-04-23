@@ -52,6 +52,9 @@ internal class GameTest : BehaviorSpec({
                 Then("It fails") {
                     result should beInstanceOf<Either.Left<Unit>>()
                 }
+                Then("Game State doesn't change") {
+                    result.state should beInstanceOf<GameState.Idle>()
+                }
             }
         }
         When("The player enters the room") {
@@ -68,6 +71,15 @@ internal class GameTest : BehaviorSpec({
             val state = room.enter(initialState)
             Then("Game state is Idle") {
                 state should beInstanceOf<GameState.Idle>()
+            }
+        }
+        And("The player has arrows left") {
+            val inventory = Inventory(arrows = 1)
+            When("The player shoots into the room") {
+                val result = room.shoot(initialState.withInventory(inventory))
+                Then("Game state is Idle") {
+                    result.state should beInstanceOf<GameState.Idle>()
+                }
             }
         }
     }
