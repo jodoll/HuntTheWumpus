@@ -8,7 +8,7 @@ class SpoofedRandomGameLogic(firstRoomNumber: Int = 0, vararg otherRoomNumbers: 
         }
     }.iterator()
 
-    override fun nextRandomRoom(rooms: List<Room>): Room {
+    override fun nextRandomRoom(rooms: Collection<Room>): Room {
         val nextRoomNumber = roomSequence.next()
         return rooms.firstOrNull { nextRoomNumber == it.number }
             ?: throw IllegalStateException("Room $nextRoomNumber isNotEmpty")

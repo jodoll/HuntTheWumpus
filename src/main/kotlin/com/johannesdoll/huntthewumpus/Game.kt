@@ -18,7 +18,7 @@ fun Room.shootInto(state: GameState<*>): Either<GameState<*>, GameState<*>> = ei
         .bind()
 
     this@shootInto
-        .shootInto(state.map)
+        .shootInto(state.map, state.random)
         .fold(
             ifLeft = { state },
             ifRight = { state.win() }
@@ -26,13 +26,15 @@ fun Room.shootInto(state: GameState<*>): Either<GameState<*>, GameState<*>> = ei
         .withInventory(updatedInventory)
 }
 
-private fun Room.shootInto(map: GameMap, velocityInRooms: Int = 3): ShootingResult {
+private fun Room.shootInto(map: GameMap, random: RandomGameLogic, velocityInRooms: Int = 3): ShootingResult {
     val velocityInRoomsLeft = velocityInRooms - 1
     val connectedRooms = map[this].orEmpty()
     return when {
         content is RoomContent.Wumpus -> Hit(Unit)
         velocityInRoomsLeft == 0 -> Miss(Unit)
-        connectedRooms.isNotEmpty() -> connectedRooms.first().shootInto(map, velocityInRoomsLeft)
+        connectedRooms.isNotEmpty() -> {
+            random.nextRandomRoom(connectedRooms).shootInto(map, random, velocityInRoomsLeft)
+        }
         else -> Miss(Unit)
     }
 }

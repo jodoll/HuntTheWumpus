@@ -47,8 +47,8 @@ internal class GameTest : BehaviorSpec({
                     result.state should beInstanceOf<GameState.Won>()
                 }
             }
-            When("He shoots into a a room three rooms away from that room") {
-                And("there is only this path") {
+            When("He shoots into a room three rooms away from that room") {
+                And("The arrow finds it's way to the wumpus room") {
                     val room = Room(1)
                     val map = GameMap(
                         room to setOf(Room(2)),
@@ -61,8 +61,8 @@ internal class GameTest : BehaviorSpec({
                     }
                 }
             }
-            When("He shoots into a a room four rooms away from that room") {
-                And("there is only this path") {
+            When("He shoots into a room four rooms away from that room") {
+                And("The arrow finds it's way to the wumpus room") {
                     val room = Room(1)
                     val map = GameMap(
                         room to setOf(Room(2)),
@@ -72,7 +72,25 @@ internal class GameTest : BehaviorSpec({
                     )
                     val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
                     Then("The game is not won") {
-                        result.state should beInstanceOf<GameState.Idle>()
+                        result.state shouldNot beInstanceOf<GameState.Won>()
+                    }
+                }
+            }
+            When("He shoots into a room connected to the wumpus room and another one") {
+                And("The arrow continues into the other room") {
+                    val room = Room(1)
+                    val testState = initialState.copy(
+                        map = GameMap(
+                            room to setOf(wumpusRoom, Room(2)),
+                            Room(2) to setOf(),
+                            wumpusRoom to setOf(),
+                        ),
+                        inventory = inventory,
+                        random = SpoofedRandomGameLogic(2)
+                    ).withInventory(inventory)
+                    val result = room.shootInto(testState)
+                    Then("The game is not won") {
+                        result.state shouldNot beInstanceOf<GameState.Won>()
                     }
                 }
             }
