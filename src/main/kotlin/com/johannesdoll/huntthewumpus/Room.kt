@@ -17,4 +17,6 @@ data class Inventory(
 sealed class RoomContent {
     object Wumpus : RoomContent()
     object Empty : RoomContent()
+    object BottomlessPit : RoomContent()
+    object GiantBat : RoomContent()
 }

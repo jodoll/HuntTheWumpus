@@ -4,6 +4,7 @@ import arrow.core.Either
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNot
 import io.kotest.matchers.types.beInstanceOf
 
 internal class GameTest : BehaviorSpec({
@@ -27,6 +28,26 @@ internal class GameTest : BehaviorSpec({
                 Then("The game is won") {
                     result.state should beInstanceOf<GameState.Won>()
                 }
+            }
+        }
+    }
+
+    Given("A room with a bottomless pit") {
+        val room = Room(content = RoomContent.BottomlessPit)
+        When("The player enters it") {
+            val state = room.enter(initialState)
+            Then("The game is lost") {
+                state should beInstanceOf<GameState.Lost>()
+            }
+        }
+    }
+
+    Given("A room with a giant bat") {
+        val room = Room(content = RoomContent.GiantBat)
+        When("The player enters it") {
+            val state = room.enter(initialState)
+            Then("The game is not lost") {
+                state shouldNot beInstanceOf<GameState.Lost>()
             }
         }
     }
