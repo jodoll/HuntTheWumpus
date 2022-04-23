@@ -49,6 +49,9 @@ internal class GameTest : BehaviorSpec({
             Then("The game is not lost") {
                 state shouldNot beInstanceOf<GameState.Lost>()
             }
+            Then("The player is moved to an empty room") {
+                state.currentRoom.content should beInstanceOf<RoomContent.Empty>()
+            }
         }
     }
 

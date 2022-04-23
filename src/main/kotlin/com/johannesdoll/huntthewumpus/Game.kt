@@ -6,7 +6,8 @@ import arrow.core.continuations.either
 fun Room.enter(state: GameState<*>): GameState<*> = when (content) {
     RoomContent.Wumpus,
     RoomContent.BottomlessPit -> GameState.Lost(state.inventory, this)
-    else -> GameState.Idle(state.inventory, this)
+    RoomContent.GiantBat -> GameState.Idle(state.inventory, Room())
+    RoomContent.Empty -> GameState.Idle(state.inventory, this)
 }
 
 fun Room.shoot(state: GameState<*>): Either<GameState<*>, GameState<*>> = either.eager {
