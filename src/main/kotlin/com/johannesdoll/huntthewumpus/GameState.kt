@@ -1,9 +1,18 @@
 package com.johannesdoll.huntthewumpus
 
-sealed class GameState {
+import arrow.core.Either
 
-    data class Lost(override val inventory: Inventory) : GameState()
-    data class Won(override val inventory: Inventory) : GameState()
+sealed interface GameState {
 
-    abstract val inventory: Inventory
+    val inventory: Inventory
+
+    data class Lost(override val inventory: Inventory) : GameState
+    data class Won(override val inventory: Inventory) : GameState
+
 }
+
+val Either<GameState, GameState>.state: GameState
+    get() = when (this) {
+        is Either.Right -> value
+        is Either.Left -> value
+    }
