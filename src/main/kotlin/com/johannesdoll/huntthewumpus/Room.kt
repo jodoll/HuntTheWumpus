@@ -5,7 +5,7 @@ data class Room(
 )
 
 data class Inventory(
-    val arrows: Int
+    val arrows: Int = 0
 )
 
 sealed class RoomContent {
