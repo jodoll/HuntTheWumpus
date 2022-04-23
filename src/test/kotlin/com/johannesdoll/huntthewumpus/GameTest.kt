@@ -2,6 +2,7 @@ package com.johannesdoll.huntthewumpus
 
 import arrow.core.Either
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNot
@@ -10,7 +11,11 @@ import io.kotest.matchers.types.beInstanceOf
 internal class GameTest : BehaviorSpec({
     val initialState = GameState.Idle(
         inventory = Inventory(),
-        currentRoom = Room(0)
+        currentRoom = Room(1),
+        map = mapOf(
+            Room(2) to setOf(Room(1)),
+            Room(1) to setOf(Room(2))
+        )
     )
 
     Given("A room with a wumpus") {
@@ -51,6 +56,9 @@ internal class GameTest : BehaviorSpec({
             }
             Then("The player is moved to an empty room") {
                 state.currentRoom.content should beInstanceOf<RoomContent.Empty>()
+            }
+            Then("The the player is in a room of the map") {
+                state.map.keys shouldContain state.currentRoom
             }
         }
     }
