@@ -21,9 +21,9 @@ internal class GameTest : BehaviorSpec({
     )
 
     Given("A room with a wumpus") {
-        val room = Room(content = RoomContent.Wumpus)
+        val wumpusRoom = Room(content = RoomContent.Wumpus)
         When("The player enters it") {
-            val state = room.enter(initialState)
+            val state = wumpusRoom.enter(initialState)
             Then("The game is lost") {
                 state should beInstanceOf<GameState.Lost>()
             }
@@ -31,9 +31,49 @@ internal class GameTest : BehaviorSpec({
         And("The Player has arrows left") {
             val inventory = Inventory(arrows = 1)
             When("When he shoots into the room") {
-                val result = room.shoot(initialState.withInventory(inventory))
+                val result = wumpusRoom.shootInto(initialState.withInventory(inventory))
                 Then("The game is won") {
                     result.state should beInstanceOf<GameState.Won>()
+                }
+            }
+            When("He shoots into a room only connected to that room") {
+                val room = Room(1)
+                val map = GameMap(
+                    room to setOf(wumpusRoom),
+                    wumpusRoom to setOf(),
+                )
+                val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
+                Then("The game is won") {
+                    result.state should beInstanceOf<GameState.Won>()
+                }
+            }
+            When("He shoots into a a room three rooms away from that room") {
+                And("there is only this path") {
+                    val room = Room(1)
+                    val map = GameMap(
+                        room to setOf(Room(2)),
+                        Room(2) to setOf(wumpusRoom),
+                        wumpusRoom to setOf(),
+                    )
+                    val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
+                    Then("The game is won") {
+                        result.state should beInstanceOf<GameState.Won>()
+                    }
+                }
+            }
+            When("He shoots into a a room four rooms away from that room") {
+                And("there is only this path") {
+                    val room = Room(1)
+                    val map = GameMap(
+                        room to setOf(Room(2)),
+                        Room(2) to setOf(Room(3)),
+                        Room(3) to setOf(wumpusRoom),
+                        wumpusRoom to setOf(),
+                    )
+                    val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
+                    Then("The game is not won") {
+                        result.state should beInstanceOf<GameState.Idle>()
+                    }
                 }
             }
         }
@@ -100,7 +140,7 @@ internal class GameTest : BehaviorSpec({
         And("The player has an arrow left") {
             val inventory = Inventory(arrows = 1)
             When("The player shoots into the room") {
-                val result = room.shoot(initialState.withInventory(inventory))
+                val result = room.shootInto(initialState.withInventory(inventory))
                 Then("The player has an arrow less") {
                     result.state.inventory.arrows shouldBe 0
                 }
@@ -112,7 +152,7 @@ internal class GameTest : BehaviorSpec({
         And("The player is out of arrows") {
             val inventory = Inventory(arrows = 0)
             When("The player shoots into the room") {
-                val result = room.shoot(initialState.withInventory(inventory))
+                val result = room.shootInto(initialState.withInventory(inventory))
                 Then("It fails") {
                     result should beInstanceOf<Either.Left<Unit>>()
                 }
@@ -140,7 +180,7 @@ internal class GameTest : BehaviorSpec({
         And("The player has arrows left") {
             val inventory = Inventory(arrows = 1)
             When("The player shoots into the room") {
-                val result = room.shoot(initialState.withInventory(inventory))
+                val result = room.shootInto(initialState.withInventory(inventory))
                 Then("Game state is Idle") {
                     result.state should beInstanceOf<GameState.Idle>()
                 }
