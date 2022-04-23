@@ -5,6 +5,9 @@ fun Room.enter(inventory: Inventory): GameState {
 }
 
 fun Room.shoot(inventory: Inventory): GameState {
-    return GameState.Won(inventory.copy(arrows = inventory.arrows - 1))
+    return GameState.Won(inventory.consumeArrow())
 }
+
+private fun Inventory.consumeArrow() =
+    Inventory.arrows.modify(this) { it - 1 }
 
