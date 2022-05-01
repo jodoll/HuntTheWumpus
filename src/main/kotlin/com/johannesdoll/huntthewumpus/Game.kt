@@ -28,7 +28,8 @@ fun Room.shootInto(state: GameState<*>): Either<GameState<*>, GameState<*>> = ei
 
 private fun Room.shootInto(map: GameMap, random: RandomGameLogic, velocityInRooms: Int = 3): ShootingResult {
     val velocityInRoomsLeft = velocityInRooms - 1
-    val connectedRooms = map[this].orEmpty()
+    val connectedRoomNumbers = map[this].orEmpty()
+    val connectedRooms = map.rooms.filter { it.number in connectedRoomNumbers }
     return when {
         content is RoomContent.Wumpus -> Hit(Unit)
         velocityInRoomsLeft == 0 -> Miss(Unit)

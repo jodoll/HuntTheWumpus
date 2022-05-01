@@ -1,6 +1,7 @@
 package com.johannesdoll.huntthewumpus
 
 import arrow.core.Either
+import arrow.core.nonEmptyListOf
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.should
@@ -10,8 +11,8 @@ import io.kotest.matchers.types.beInstanceOf
 
 internal class GameTest : BehaviorSpec({
     val gameMap = mapOf(
-        Room(2) to setOf(Room(1)),
-        Room(1) to setOf(Room(2))
+        Room(2) to nonEmptyListOf(1),
+        Room(1) to nonEmptyListOf(2)
     )
     val initialState = GameState.Idle(
         inventory = Inventory(),
@@ -39,8 +40,8 @@ internal class GameTest : BehaviorSpec({
             When("He shoots into a room only connected to that room") {
                 val room = Room(1)
                 val map = GameMap(
-                    room to setOf(wumpusRoom),
-                    wumpusRoom to setOf(),
+                    room withTunnelsTo roomsWithNumber(wumpusRoom.number),
+                    wumpusRoom withTunnelsTo roomsWithNumber(1),
                 )
                 val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
                 Then("The game is won") {
@@ -51,9 +52,9 @@ internal class GameTest : BehaviorSpec({
                 And("The arrow finds it's way to the wumpus room") {
                     val room = Room(1)
                     val map = GameMap(
-                        room to setOf(Room(2)),
-                        Room(2) to setOf(wumpusRoom),
-                        wumpusRoom to setOf(),
+                        room withTunnelsTo roomsWithNumber(2),
+                        Room(2) withTunnelsTo roomsWithNumber(wumpusRoom.number),
+                        wumpusRoom withTunnelsTo roomsWithNumber(2),
                     )
                     val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
                     Then("The game is won") {
@@ -65,10 +66,10 @@ internal class GameTest : BehaviorSpec({
                 And("The arrow finds it's way to the wumpus room") {
                     val room = Room(1)
                     val map = GameMap(
-                        room to setOf(Room(2)),
-                        Room(2) to setOf(Room(3)),
-                        Room(3) to setOf(wumpusRoom),
-                        wumpusRoom to setOf(),
+                        room withTunnelsTo roomsWithNumber(2),
+                        Room(2) withTunnelsTo roomsWithNumber(3),
+                        Room(3) withTunnelsTo roomsWithNumber(wumpusRoom.number),
+                        wumpusRoom withTunnelsTo roomsWithNumber(1),
                     )
                     val result = room.shootInto(initialState.copy(map = map).withInventory(inventory))
                     Then("The game is not won") {
@@ -81,9 +82,9 @@ internal class GameTest : BehaviorSpec({
                     val room = Room(1)
                     val testState = initialState.copy(
                         map = GameMap(
-                            room to setOf(wumpusRoom, Room(2)),
-                            Room(2) to setOf(),
-                            wumpusRoom to setOf(),
+                            room withTunnelsTo roomsWithNumber(wumpusRoom.number, 2),
+                            Room(2) withTunnelsTo roomsWithNumber(2),
+                            wumpusRoom withTunnelsTo roomsWithNumber(2),
                         ),
                         inventory = inventory,
                         random = SpoofedRandomGameLogic(2)
@@ -124,8 +125,8 @@ internal class GameTest : BehaviorSpec({
         And("The next random room is empty") {
             val testState = initialState.copy(
                 map = GameMap(
-                    Room(1, content = RoomContent.Wumpus) to emptySet(),
-                    Room(0, content = RoomContent.Empty) to emptySet()
+                    Room(1, content = RoomContent.Wumpus) withTunnelsTo roomsWithNumber(0),
+                    Room(0, content = RoomContent.Empty) withTunnelsTo roomsWithNumber(1)
                 ),
                 random = SpoofedRandomGameLogic(0)
             )
@@ -139,8 +140,8 @@ internal class GameTest : BehaviorSpec({
         And("The next random room is not empty") {
             val testState = initialState.copy(
                 map = GameMap(
-                    Room(1, content = RoomContent.Wumpus) to emptySet(),
-                    Room(0, content = RoomContent.Empty) to emptySet()
+                    Room(1, content = RoomContent.Wumpus).withTunnelsTo(0),
+                    Room(0, content = RoomContent.Empty).withTunnelsTo(1)
                 ),
                 random = PseudoRandomGameLogic()
             )
