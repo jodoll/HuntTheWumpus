@@ -11,6 +11,6 @@ class SpoofedRandomGameLogic(firstRoomNumber: Int = 0, vararg otherRoomNumbers: 
     override fun nextRandomRoom(rooms: Collection<Room>): Room {
         val nextRoomNumber = roomSequence.next()
         return rooms.firstOrNull { nextRoomNumber == it.number }
-            ?: throw IllegalStateException("Room $nextRoomNumber isNotEmpty")
+            ?: throw IllegalStateException("Room $nextRoomNumber does not exist")
     }
 }
