@@ -92,6 +92,22 @@ internal class GameTest : BehaviorSpec({
                     Then("The game is not won") {
                         result.state shouldNot beInstanceOf<GameState.Won>()
                     }
+
+                    xAnd("The Wumpus moves") {
+                        And("He moves not to the players room") {
+                            Then("The game is not lost") {
+
+                            }
+                            Then("He is in a room next to the room he was in") {
+
+                            }
+                        }
+                        And("He moves to the players room") {
+                            Then("The game is lost") {
+
+                            }
+                        }
+                    }
                 }
             }
         }
