@@ -1,11 +1,12 @@
 package com.johannesdoll.huntthewumpus
 
 import arrow.core.NonEmptyList
-import arrow.core.nonEmptyListOf
 
 fun MapParams.generateMap(): GameMap {
-    val numberOfRooms = 2 + giantBats + bottomlessPits
-    val roomNumbers = (0 until numberOfRooms).asSequence().shuffled()
+    val minSize = giantBats + bottomlessPits + 2
+    require(shape.numberOfRooms > minSize) { "Map has only ${shape.numberOfRooms} of the required $minSize rooms" }
+
+    val roomNumbers = (0 until shape.numberOfRooms).asSequence().shuffled()
 
     val rooms = roomNumbers
         .mapIndexed { index, number ->
@@ -19,12 +20,8 @@ fun MapParams.generateMap(): GameMap {
             Room(number, content)
         }
         .sortedBy { it.number }
-        .mapIndexed { index, room ->
-            when (index) {
-                0 -> room.withTunnelsTo(roomNumbers.minus(0).toList().toNelUnsafe())
-                else -> room.withTunnelsTo(nonEmptyListOf(0))
-            }
-        }
+        .toList()
+        .let { shape.layOutRooms(it) }
         .toList()
 
     return GameMap(rooms)

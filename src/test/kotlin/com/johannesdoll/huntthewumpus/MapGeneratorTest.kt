@@ -1,10 +1,9 @@
 package com.johannesdoll.huntthewumpus
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.collections.beEmpty
-import io.kotest.matchers.collections.haveSize
-import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.*
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNot
@@ -59,6 +58,42 @@ class MapGeneratorTest : BehaviorSpec({
             Then("The map contains the given amount of bottomless Pits") {
                 map.rooms.filter { it.content == RoomContent.BottomlessPit } should haveSize(2)
             }
+        }
+    }
+    Given("Shape is Square") {
+        And("Size is 4 by 4") {
+            val mapParams = MapParams(shape = MapShape.Rectangle(4, 4))
+
+            When("Generating a GameMap") {
+                val map: GameMap = mapParams.generateMap()
+                Then("Map has 16 fields") {
+                    map.rooms should haveSize(16)
+                }
+                Then("Room 0 is connected to Room 1") {
+                    map[0].connections shouldContain 1
+                }
+                Then("Room 0 is connected to Room 4") {
+                    map[0].connections shouldContain 4
+                }
+                Then("Room 0 is connected to two other Rooms") {
+                    map[0].connections shouldHaveSize 2
+                }
+            }
+        }
+        And("Size is to small for an empty room to be left") {
+            val mapParams = MapParams(
+                giantBats = 1,
+                bottomlessPits = 1,
+                shape = MapShape.Rectangle(3, 1)
+            )
+            When("Generating a GameMap") {
+                Then("generation fails") {
+                    shouldThrow<IllegalArgumentException> {
+                        mapParams.generateMap()
+                    }
+                }
+            }
+
         }
     }
 })

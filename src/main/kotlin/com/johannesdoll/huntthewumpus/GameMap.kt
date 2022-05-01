@@ -12,6 +12,10 @@ class GameMap private constructor(private val map: Map<Int, ConnectedRoom>) {
 
     operator fun get(room: Room): NonEmptyList<Int>? = map.values.find { it.room.number == room.number }?.connections
 
+    operator fun get(roomNumber: Int): ConnectedRoom = requireNotNull(map[roomNumber]) {
+        "Invalid room number $roomNumber"
+    }
+
     constructor(vararg rooms: ConnectedRoom) : this(rooms.associateBy { it.room.number })
     constructor(rooms: List<ConnectedRoom>) : this(rooms.associateBy { it.room.number })
 }
