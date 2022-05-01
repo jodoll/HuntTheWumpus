@@ -24,14 +24,14 @@ class MapGeneratorTest : BehaviorSpec({
                 }
             }
             Then("All connected room numbers are in rooms") {
-                map.rooms.map { it.number } shouldContainAll map.values.flatten().distinct()
+                map.rooms.map { it.number } shouldContainAll map.connectedRooms.flatMap { it.connections }.distinct()
             }
             Then("All rooms are reachable") {
-                map.values.flatten().distinct() shouldContainAll map.rooms.map { it.number }
+                map.connectedRooms.flatMap { it.connections }.distinct() shouldContainAll map.rooms.map { it.number }
             }
             Then("Every tunnel to a room leads back, too") {
-                val waysForward = map.entries
-                    .map { entry -> entry.value.map { entry.key.number to it } }
+                val waysForward = map.connectedRooms
+                    .map { entry -> entry.connections.map { entry.room.number to it } }
                     .flatten()
                     .distinct()
 

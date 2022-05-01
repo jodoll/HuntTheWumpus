@@ -2,10 +2,18 @@ package com.johannesdoll.huntthewumpus
 
 import arrow.core.NonEmptyList
 
-class GameMap(map: Map<Room, NonEmptyList<Int>>) : Map<Room, NonEmptyList<Int>> by map {
+class GameMap private constructor(private val map: Map<Int, ConnectedRoom>) {
 
-    constructor(vararg rooms: ConnectedRoom) : this(rooms.associate { it.room to it.connections })
-    constructor(rooms: List<ConnectedRoom>) : this(rooms.associate { it.room to it.connections })
+    val rooms: List<Room>
+        get() = map.values.map { it.room }
+
+    val connectedRooms: List<ConnectedRoom>
+        get() = map.values.toList()
+
+    operator fun get(room: Room): NonEmptyList<Int>? = map.values.find { it.room.number == room.number }?.connections
+
+    constructor(vararg rooms: ConnectedRoom) : this(rooms.associateBy { it.room.number })
+    constructor(rooms: List<ConnectedRoom>) : this(rooms.associateBy { it.room.number })
 }
 
 data class ConnectedRoom(
@@ -20,7 +28,4 @@ fun Room.withTunnelsTo(firstRoom: Int, vararg otherRooms: Int) =
 
 fun roomsWithNumber(firstRoom: Int, vararg otherRooms: Int) = NonEmptyList(firstRoom, otherRooms.toList())
 
-fun GameMap.emptyRooms() = keys.filter { it.content is RoomContent.Empty }
-
-val GameMap.rooms: Set<Room>
-    get() = keys
+fun GameMap.emptyRooms() = rooms.filter { it.content is RoomContent.Empty }

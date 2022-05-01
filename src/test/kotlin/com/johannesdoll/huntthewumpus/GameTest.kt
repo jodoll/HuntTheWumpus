@@ -1,7 +1,6 @@
 package com.johannesdoll.huntthewumpus
 
 import arrow.core.Either
-import arrow.core.nonEmptyListOf
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.should
@@ -10,9 +9,9 @@ import io.kotest.matchers.shouldNot
 import io.kotest.matchers.types.beInstanceOf
 
 internal class GameTest : BehaviorSpec({
-    val gameMap = mapOf(
-        Room(2) to nonEmptyListOf(1),
-        Room(1) to nonEmptyListOf(2)
+    val gameMap = listOf(
+        Room(2).withTunnelsTo(1),
+        Room(1).withTunnelsTo(2)
     )
     val initialState = GameState.Idle(
         inventory = Inventory(),
@@ -119,7 +118,7 @@ internal class GameTest : BehaviorSpec({
                 state.currentRoom.content should beInstanceOf<RoomContent.Empty>()
             }
             Then("The the player is in a room of the map") {
-                state.map.keys shouldContain state.currentRoom
+                state.map.rooms shouldContain state.currentRoom
             }
         }
         And("The next random room is empty") {

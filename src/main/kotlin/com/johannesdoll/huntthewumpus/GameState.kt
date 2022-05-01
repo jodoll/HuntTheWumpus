@@ -53,4 +53,4 @@ val Either<GameState<*>, GameState<*>>.state: GameState<*>
         is Either.Left -> value
     }
 
-fun GameState<*>.nextRandomRoom() = random.nextRandomRoom(map.keys.toList())
+fun GameState<*>.nextRandomRoom() = random.nextRandomRoom(map.rooms.toList())
